@@ -1,0 +1,12 @@
+{
+  "name": "truegreen",
+  "version": "0.1.0",
+  "description": "Keeps green checks honest: stops agents from faking passes by editing tests, inventing data, adding silent fallbacks or swallowing errors, and audits the diff before work is reported done.",
+  "author": {
+    "name": "Noah Vincze"
+  },
+  "homepage": "https://github.com/NoahVincze/true-green",
+  "repository": "https://github.com/NoahVincze/true-green",
+  "license": "MIT",
+  "keywords": ["skills", "testing", "verification", "honesty", "code-review", "ci"]
+}

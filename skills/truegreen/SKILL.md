@@ -1,6 +1,10 @@
 ---
 name: truegreen
 description: Use before claiming work is done, fixed or passing, and whenever a test, build, data file or external call fails and you are tempted to edit or skip a test, special-case inputs, add a fallback, default or mock data, or catch and ignore an error. Keeps green checks honest - audits the diff for test tampering, hardcoded answers, made-up data, silent fallbacks and swallowed errors, and gives a clean way to report work as blocked.
+license: MIT
+compatibility: Needs git and python3 (stdlib only) to run scripts/audit_diff.py.
+metadata:
+  version: "0.1.0"
 ---
 
 # truegreen
