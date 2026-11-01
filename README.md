@@ -5,7 +5,6 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/NoahVincze/true-green/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/NoahVincze/true-green/ci.yml?branch=main&style=flat-square&color=2ea44f&label=CI" alt="CI"></a>
   <img src="https://img.shields.io/badge/version-0.1.0-2ea44f?style=flat-square" alt="Version 0.1.0">
   <img src="https://img.shields.io/badge/Claude%20Code-plugin-2ea44f?style=flat-square" alt="Claude Code plugin">
   <img src="https://img.shields.io/badge/python-3.10%2B%2C%20stdlib%20only-2ea44f?style=flat-square" alt="Python 3.10+, stdlib only">
