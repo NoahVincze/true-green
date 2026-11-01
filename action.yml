@@ -35,7 +35,7 @@ runs:
         PUSH_BEFORE: ${{ github.event.before }}
         AUDIT: ${{ github.action_path }}/skills/truegreen/scripts/audit_diff.py
       run: |
-        set -uo pipefail
+        set -euo pipefail
         PY=$(command -v python3 || command -v python)
 
         base="$INPUT_BASE"
@@ -51,10 +51,11 @@ runs:
           base="HEAD~1"
         fi
 
-        "$PY" "$AUDIT" --base "$base"
-        code=$?
-        [ "$code" -eq 2 ] && exit 2
-        "$PY" "$AUDIT" --base "$base" --json > "$RUNNER_TEMP/truegreen.json"
+        # exit 1 means HIGH findings; keep going so they get annotated
+        code=0
+        "$PY" "$AUDIT" --base "$base" || code=$?
+        if [ "$code" -eq 2 ]; then exit 2; fi
+        "$PY" "$AUDIT" --base "$base" --json > "$RUNNER_TEMP/truegreen.json" || true
 
         REPORT="$RUNNER_TEMP/truegreen.json" "$PY" - <<'EOF'
         import json, os
