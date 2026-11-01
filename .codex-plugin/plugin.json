@@ -1,0 +1,28 @@
+{
+  "name": "truegreen",
+  "version": "0.1.0",
+  "description": "Keeps green checks honest: when a check fails, the agent fixes the code or reports the problem, instead of quietly editing tests, inventing data or swallowing errors.",
+  "author": {
+    "name": "Noah Vincze",
+    "url": "https://github.com/NoahVincze"
+  },
+  "homepage": "https://github.com/NoahVincze/true-green",
+  "repository": "https://github.com/NoahVincze/true-green",
+  "license": "MIT",
+  "keywords": ["skills", "testing", "verification", "honesty", "code-review", "ci"],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "truegreen",
+    "shortDescription": "Green means it works. Not that someone edited the test.",
+    "longDescription": "When a check fails, your agent fixes the code or tells you up front, instead of quietly editing tests, inventing data or swallowing errors. Every report starts with DONE, DONE WITH CAVEATS or BLOCKED and lists any tests it changed, and an audit script checks the diff before the agent reports.",
+    "developerName": "Noah Vincze",
+    "category": "Developer Tools",
+    "capabilities": ["Read", "Write", "Execute"],
+    "websiteURL": "https://github.com/NoahVincze/true-green",
+    "defaultPrompt": [
+      "Fix the failing tests without changing what they check.",
+      "Get CI green and tell me exactly which tests you changed.",
+      "Audit my diff for edited tests, made-up data and swallowed errors."
+    ]
+  }
+}

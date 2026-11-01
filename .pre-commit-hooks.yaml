@@ -1,0 +1,7 @@
+- id: truegreen-audit
+  name: truegreen audit
+  description: Flag edited or skipped tests, hardcoded answers, made-up data and swallowed errors in the changes being committed.
+  entry: truegreen-audit
+  language: python
+  pass_filenames: false
+  always_run: true

@@ -1,0 +1,90 @@
+name: truegreen audit
+description: Flag changes that make checks pass without making the code work, such as edited tests, hardcoded answers, made-up data and swallowed errors.
+author: Noah Vincze
+branding:
+  icon: check-circle
+  color: green
+
+inputs:
+  base:
+    description: Ref to compare against. Default is the merge base with the pull request's target branch, or the commit before the push.
+    required: false
+    default: ""
+  fail-on-high:
+    description: Fail the step when there is at least one HIGH finding. Set to "false" to only annotate.
+    required: false
+    default: "true"
+
+outputs:
+  high:
+    description: Number of HIGH findings.
+    value: ${{ steps.audit.outputs.high }}
+  medium:
+    description: Number of MEDIUM findings.
+    value: ${{ steps.audit.outputs.medium }}
+
+runs:
+  using: composite
+  steps:
+    - id: audit
+      shell: bash
+      env:
+        INPUT_BASE: ${{ inputs.base }}
+        FAIL_ON_HIGH: ${{ inputs.fail-on-high }}
+        PR_BASE_REF: ${{ github.base_ref }}
+        PUSH_BEFORE: ${{ github.event.before }}
+        AUDIT: ${{ github.action_path }}/skills/truegreen/scripts/audit_diff.py
+      run: |
+        set -uo pipefail
+        PY=$(command -v python3 || command -v python)
+
+        base="$INPUT_BASE"
+        if [ -z "$base" ] && [ -n "$PR_BASE_REF" ]; then
+          git fetch --no-tags --quiet origin "$PR_BASE_REF"
+          base=$(git merge-base "origin/$PR_BASE_REF" HEAD) || {
+            echo "::error title=truegreen::no merge base with origin/$PR_BASE_REF; check out with fetch-depth: 0"
+            exit 2
+          }
+        elif [ -z "$base" ] && [ -n "$PUSH_BEFORE" ] && git cat-file -e "$PUSH_BEFORE^{commit}" 2>/dev/null; then
+          base="$PUSH_BEFORE"
+        elif [ -z "$base" ]; then
+          base="HEAD~1"
+        fi
+
+        "$PY" "$AUDIT" --base "$base"
+        code=$?
+        [ "$code" -eq 2 ] && exit 2
+        "$PY" "$AUDIT" --base "$base" --json > "$RUNNER_TEMP/truegreen.json"
+
+        REPORT="$RUNNER_TEMP/truegreen.json" "$PY" - <<'EOF'
+        import json, os
+
+        def esc(s):
+            return s.replace("%", "%25").replace("\r", "%0D").replace("\n", "%0A")
+
+        def prop(s):
+            return esc(s).replace(":", "%3A").replace(",", "%2C")
+
+        with open(os.environ["REPORT"], encoding="utf-8") as fh:
+            report = json.load(fh)
+        rows = []
+        for f in report["findings"]:
+            level = "error" if f["severity"] == "HIGH" else "warning"
+            loc = "file=" + prop(f["file"]) + (",line=%d" % f["line"] if f["line"] else "")
+            print("::%s %s,title=%s::%s" % (level, loc, prop("truegreen " + f["code"]), esc(f["message"])))
+            where = f["file"] + (":%d" % f["line"] if f["line"] else "")
+            rows.append("| %s | %s | `%s` | %s |" % (f["severity"], f["code"], where, f["message"].replace("|", "\\|")))
+
+        with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as fh:
+            fh.write("high=%d\nmedium=%d\n" % (report["high"], report["medium"]))
+        with open(os.environ["GITHUB_STEP_SUMMARY"], "a", encoding="utf-8") as fh:
+            fh.write("### truegreen audit: %d HIGH, %d MEDIUM\n\n" % (report["high"], report["medium"]))
+            fh.write("%d file(s) changed vs `%s`.\n\n" % (report["files_changed"], report["base"]))
+            if rows:
+                fh.write("| Severity | Code | Where | Finding |\n|---|---|---|---|\n" + "\n".join(rows) + "\n")
+        EOF
+
+        if [ "$code" -ne 0 ] && [ "$FAIL_ON_HIGH" = "true" ]; then
+          exit "$code"
+        fi
+        exit 0

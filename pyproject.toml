@@ -1,0 +1,23 @@
+# Packages only the audit script, as the `truegreen-audit` command.
+# Used by the pre-commit hook (.pre-commit-hooks.yaml) and `pipx install`.
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "truegreen"
+version = "0.1.0"
+description = "Flag changes that make checks pass without making the code work."
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.10"
+
+[project.urls]
+Homepage = "https://github.com/NoahVincze/true-green"
+
+[project.scripts]
+truegreen-audit = "audit_diff:main"
+
+[tool.setuptools]
+package-dir = {"" = "skills/truegreen/scripts"}
+py-modules = ["audit_diff"]

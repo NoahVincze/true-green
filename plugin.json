@@ -1,0 +1,14 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "truegreen",
+  "version": "0.1.0",
+  "description": "Keeps green checks honest: when a check fails, the agent fixes the code or reports the problem, instead of quietly editing tests, inventing data or swallowing errors.",
+  "author": {
+    "name": "Noah Vincze",
+    "url": "https://github.com/NoahVincze"
+  },
+  "homepage": "https://github.com/NoahVincze/true-green",
+  "repository": "https://github.com/NoahVincze/true-green",
+  "license": "MIT",
+  "keywords": ["skills", "testing", "verification", "honesty", "code-review", "ci"]
+}

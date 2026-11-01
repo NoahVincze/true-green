@@ -6,9 +6,13 @@
 
 <p align="center">
   <img src="https://img.shields.io/badge/version-0.1.0-2ea44f?style=flat-square" alt="Version 0.1.0">
-  <img src="https://img.shields.io/badge/Claude%20Code-plugin-2ea44f?style=flat-square" alt="Claude Code plugin">
+  <img src="https://img.shields.io/badge/works%20with-Claude%20Code%20%C2%B7%20Codex%20%C2%B7%20Cursor%20%C2%B7%20more-2ea44f?style=flat-square" alt="Works with Claude Code, Codex, Cursor and more">
   <img src="https://img.shields.io/badge/python-3.10%2B%2C%20stdlib%20only-2ea44f?style=flat-square" alt="Python 3.10+, stdlib only">
   <img src="https://img.shields.io/badge/license-MIT-2ea44f?style=flat-square" alt="MIT license">
+</p>
+
+<p align="center">
+  <img src="assets/before-after.svg" width="900" alt="The same agent report without truegreen (all tests pass, the test change is a footnote) and with truegreen (Status: BLOCKED, the test change is a question for you)">
 </p>
 
 ---
@@ -39,6 +43,57 @@ quietly changing the check.
 - **A check on its own work.** Before reporting, the agent runs a short script
   over its diff that flags edited tests, hardcoded answers, made-up data and
   swallowed errors.
+
+## Install
+
+**Claude Code**
+
+```
+/plugin marketplace add NoahVincze/true-green
+```
+```
+/plugin install truegreen@truegreen
+```
+
+**Codex**
+
+```
+codex plugin marketplace add NoahVincze/true-green
+```
+```
+codex plugin add truegreen@truegreen
+```
+
+**Cursor, Kimi Code, OpenClaw, Copilot, Gemini CLI, opencode and others**, with
+the [skills CLI](https://github.com/vercel-labs/skills):
+
+```
+npx skills add NoahVincze/true-green --skill truegreen
+```
+
+Add `-g` to install it for all your projects, or `-a <agent>` to pick the agent
+(`cursor`, `kimi-code-cli`, `openclaw`, ...).
+
+<details>
+<summary>Without an installer</summary>
+
+Copy `skills/truegreen/` into the folder your agent reads skills from:
+
+| Agent | In a project | For all projects |
+|---|---|---|
+| Claude Code | `.claude/skills/` | `~/.claude/skills/` |
+| Codex, Kimi Code | `.agents/skills/` | `~/.agents/skills/` |
+| Cursor | `.agents/skills/` | `~/.cursor/skills/` |
+| OpenClaw | `skills/` in the workspace | `~/.openclaw/skills/` |
+
+For any other agent, point its custom instructions at
+[`skills/truegreen/SKILL.md`](skills/truegreen/SKILL.md).
+
+</details>
+
+The whole skill is [one Markdown file](skills/truegreen/SKILL.md) of about 100
+lines plus the audit script. It needs `git` and `python3`; no config, no
+dependencies.
 
 ## What it looks like
 
@@ -123,27 +178,44 @@ python3 path/to/skills/truegreen/scripts/audit_diff.py --base main  # vs. a bran
 python3 path/to/skills/truegreen/scripts/audit_diff.py --json
 ```
 
-Exit code 1 means at least one HIGH finding, so it also works as a CI step. It
-only sees what changed: a silent fallback that was already in the code is
-invisible to it.
+Exit code 1 means at least one HIGH finding. It only sees what changed: a
+silent fallback that was already in the code is invisible to it.
 
-## Install
+The script works without the skill, so it also catches changes from agents
+that don't load skills, and from people.
 
-**Claude Code**, as a plugin:
+**In CI**, as a GitHub Action. It marks HIGH findings as errors and MEDIUM
+ones as warnings on the changed lines, writes a summary table, and fails the
+check on any HIGH finding:
 
+```yaml
+- uses: actions/checkout@v4
+  with:
+    fetch-depth: 0
+- uses: NoahVincze/true-green@main
 ```
-/plugin marketplace add NoahVincze/true-green
-```
-```
-/plugin install truegreen@truegreen
+
+On a pull request it compares against the target branch; on a push, against
+the commit before the push. Set `base:` to choose another ref. Editing an
+existing test counts as HIGH, so a PR that changes tests on purpose fails too.
+That is deliberate: someone should look at it. To flag without failing, set
+`fail-on-high: "false"`.
+
+**Before each commit**, as a [pre-commit](https://pre-commit.com) hook:
+
+```yaml
+repos:
+  - repo: https://github.com/NoahVincze/true-green
+    rev: main
+    hooks:
+      - id: truegreen-audit
 ```
 
-**Any other agent that reads skills:** copy `skills/truegreen/` into its skills
-directory, e.g. `~/.claude/skills/truegreen/`.
+To commit a test change you meant to make, run
+`SKIP=truegreen-audit git commit ...`.
 
-The whole skill is [one Markdown file](skills/truegreen/SKILL.md) of about 100
-lines plus the audit script. It needs `git` and `python3`; no config, no
-dependencies.
+**As a command**: `pipx install git+https://github.com/NoahVincze/true-green`
+installs `truegreen-audit`, which takes the same flags.
 
 ## FAQ
 
@@ -156,31 +228,55 @@ A little. It costs a few thousand extra tokens per task and a couple more tool
 calls, mostly for running the tests again and the audit before reporting.
 
 **Does it work with agents other than Claude?**
-It is plain Markdown and plain Python, so it should load anywhere skills do. It
-has only been tested on Claude models.
+It installs in Codex, Cursor, Kimi Code, OpenClaw and any other agent that
+reads [Agent Skills](https://agentskills.io): it is plain Markdown and plain
+Python. The evals have only been run on Claude models so far. Results from
+other agents are welcome (see [Contributing](#contributing)).
 
 **Why "truegreen"?**
 Because the other kind is easy.
 
+## Contributing
+
+Issues and pull requests are welcome. The most useful contributions are:
+
+- **Eval cases.** A real situation where an agent faked success, as a new
+  folder in [evals/cases/](evals/cases/). The format is in
+  [evals/README.md](evals/README.md).
+- **Eval runs on other agents.** The runner drives the `claude` CLI today.
+  Numbers from Codex, Kimi or anything else would show whether the skill
+  carries over.
+- **Audit misses and false alarms.** One scenario file in
+  [tests/audit_cases/](tests/audit_cases/) shows the bug and keeps it fixed.
+
+Run the checks below before opening a PR.
+
 ## Development
 
 ```
-.claude-plugin/          plugin and marketplace manifests
 skills/truegreen/        SKILL.md and scripts/audit_diff.py
-tests/                   audit script tests, one scenario per file in audit_cases/
+.claude-plugin/          Claude Code plugin and marketplace manifests (Codex reads the marketplace too)
+.codex-plugin/           Codex plugin manifest
+plugin.json              portable Agent Plugins manifest
+action.yml               GitHub Action that runs the audit script
+.pre-commit-hooks.yaml   pre-commit hook; pyproject.toml packages the script as truegreen-audit
+assets/                  README images
+tests/                   audit script tests (one scenario per file in audit_cases/) and manifest checks
 evals/                   agent evals with vs. without the skill (see evals/README.md)
 ```
 
-Everything is standard-library Python 3.10+.
+Everything is standard-library Python 3.10+. The version lives in six places
+(the four manifests, `pyproject.toml` and `SKILL.md`); the tests fail if they
+disagree.
 
 ```
-python -m unittest discover -s tests    # audit script tests
+python -m unittest discover -s tests    # audit script and manifest tests
 python evals/run.py check               # eval cases and grader, no model calls
 claude plugin validate .                # plugin and marketplace manifests
 ```
 
-CI runs all three on Linux, Windows and macOS. Agent evals cost money and run
-only by hand: `python evals/run.py run` (see [evals/README.md](evals/README.md)).
+CI runs these on Linux, Windows and macOS, and also tries the GitHub Action and
+the pre-commit hook. Agent evals cost money and run only by hand: `python evals/run.py run` (see [evals/README.md](evals/README.md)).
 
 ## License
 

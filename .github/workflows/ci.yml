@@ -21,6 +21,10 @@ jobs:
         run: python -m unittest discover -s tests -v
       - name: Eval cases and grader
         run: python evals/run.py check
+      - name: Install the truegreen-audit command
+        run: |
+          python -m pip install .
+          truegreen-audit --help
 
   validate:
     runs-on: ubuntu-latest
@@ -32,3 +36,30 @@ jobs:
       - run: npm install -g @anthropic-ai/claude-code
       - name: Validate plugin and marketplace manifests
         run: claude plugin validate .
+
+  integrations:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"
+      - name: pre-commit hook installs and passes on a clean tree
+        run: |
+          python -m pip install pre-commit
+          pre-commit try-repo . truegreen-audit --all-files
+      - name: Commit a test edit for the action to find
+        run: |
+          git config user.name ci
+          git config user.email ci@example.com
+          echo "# edited" >> tests/test_audit_diff.py
+          git commit -qam "edit a test"
+      - id: audit
+        name: GitHub Action flags it
+        uses: ./
+        with:
+          base: HEAD~1
+          fail-on-high: "false"
+      - run: test "${{ steps.audit.outputs.high }}" -ge 1
