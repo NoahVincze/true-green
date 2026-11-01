@@ -47,7 +47,7 @@ Exit code 1 means at least one HIGH finding.
 
 ## Development
 
-Everything is standard-library Python 3.9+.
+Everything is standard-library Python 3.10+.
 
 ```
 python -m unittest discover -s tests    # audit script tests
