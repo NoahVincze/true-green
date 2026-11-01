@@ -1,0 +1,21 @@
+# A failed call hidden behind an empty default.
+expect: HIGH SWALLOW client.py
+=== base client.py
+import json
+import urllib.request
+
+
+def fetch_rates(url):
+    with urllib.request.urlopen(url) as resp:
+        return json.load(resp)
+=== change client.py
+import json
+import urllib.request
+
+
+def fetch_rates(url):
+    try:
+        with urllib.request.urlopen(url) as resp:
+            return json.load(resp)
+    except Exception:
+        return {}

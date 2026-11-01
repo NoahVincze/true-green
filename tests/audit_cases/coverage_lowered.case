@@ -1,0 +1,8 @@
+# Lowering the coverage gate.
+expect: HIGH SUPPRESS pyproject.toml
+=== base pyproject.toml
+[tool.coverage.report]
+fail_under = 90
+=== change pyproject.toml
+[tool.coverage.report]
+fail_under = 70

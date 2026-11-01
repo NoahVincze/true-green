@@ -1,0 +1,18 @@
+# Changing an expected value to match the code is reported old -> new.
+expect: HIGH TEST-EDIT tests/test_calc.py
+expect: HIGH TEST-EXPECT tests/test_calc.py
+=== base calc.py
+def add(a, b):
+    return a - b
+=== base tests/test_calc.py
+from calc import add
+
+
+def test_add():
+    assert add(2, 3) == 5
+=== change tests/test_calc.py
+from calc import add
+
+
+def test_add():
+    assert add(2, 3) == -1

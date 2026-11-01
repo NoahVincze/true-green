@@ -1,0 +1,14 @@
+# A real bug fix in source code, tests untouched: no findings.
+expect: none
+=== base calc.py
+def add(a, b):
+    return a - b
+=== base tests/test_calc.py
+from calc import add
+
+
+def test_add():
+    assert add(2, 3) == 5
+=== change calc.py
+def add(a, b):
+    return a + b

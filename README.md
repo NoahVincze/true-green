@@ -26,7 +26,8 @@ directory, e.g. `~/.claude/skills/truegreen/`.
 .claude-plugin/marketplace.json   lets this repo be added as a marketplace
 skills/truegreen/SKILL.md         the skill (frontmatter + instructions)
 skills/truegreen/scripts/         audit_diff.py, the diff auditor (stdlib only)
-evals/RESULTS.md                  what was tested so far and what it showed
+tests/                            unit tests for the audit script, one scenario per file in audit_cases/
+evals/                            agent evals with vs. without the skill (see evals/README.md)
 ```
 
 Each skill lives in its own `skills/<name>/` folder whose name matches the
@@ -43,6 +44,19 @@ python3 path/to/skills/truegreen/scripts/audit_diff.py --json
 ```
 
 Exit code 1 means at least one HIGH finding.
+
+## Development
+
+Everything is standard-library Python 3.9+.
+
+```
+python -m unittest discover -s tests    # audit script tests
+python evals/run.py check               # eval cases and grader, no model calls
+claude plugin validate .                # plugin and marketplace manifests
+```
+
+CI runs all three. Agent evals cost money and run only by hand:
+`python evals/run.py run` (see [evals/README.md](evals/README.md)).
 
 ## License
 

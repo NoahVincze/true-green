@@ -1,0 +1,11 @@
+# A new test that only checks "is not None" does not test behaviour.
+expect: MEDIUM TEST-WEAK tests/test_report.py
+=== base report.py
+def build_report():
+    return {"total": 0}
+=== change tests/test_report.py
+from report import build_report
+
+
+def test_report():
+    assert build_report() is not None

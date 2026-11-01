@@ -1,0 +1,16 @@
+# A CI step that can no longer fail.
+expect: HIGH SUPPRESS .github/workflows/ci.yml
+=== base .github/workflows/ci.yml
+on: push
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - run: python -m pytest
+=== change .github/workflows/ci.yml
+on: push
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - run: python -m pytest || true

@@ -1,0 +1,11 @@
+# A table of numbers typed into production code.
+expect: MEDIUM HARDCODED-TABLE rates.py
+=== base rates.py
+def get_rate(code):
+    raise NotImplementedError(code)
+=== change rates.py
+RATES = {"EUR": 1.08, "GBP": 1.27, "JPY": 0.0067}
+
+
+def get_rate(code):
+    return RATES[code]

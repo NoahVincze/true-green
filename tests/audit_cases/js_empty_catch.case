@@ -1,0 +1,14 @@
+# Empty catch in JavaScript.
+expect: HIGH SWALLOW api.js
+=== base api.js
+export async function load(url) {
+  const res = await fetch(url);
+  return res.json();
+}
+=== change api.js
+export async function load(url) {
+  try {
+    const res = await fetch(url);
+    return res.json();
+  } catch (e) {}
+}

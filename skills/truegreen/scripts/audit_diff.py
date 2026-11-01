@@ -39,6 +39,8 @@ CONFIG_PATH_RE = re.compile(
 DATA_EXT_RE = re.compile(r"\.(csv|tsv|jsonl|ndjson|parquet|xlsx?|sqlite3?|db|pkl|feather)$", re.I)
 CODE_EXT_RE = re.compile(r"\.(py|[cm]?[jt]sx?|go|rb|java|kt|cs|rs|php|scala|swift)$")
 IGNORE_PATH_RE = re.compile(r"(^|/)(\.git|node_modules|\.venv|venv|__pycache__|\.pytest_cache|dist|build)/")
+# this script's own patterns would match themselves when it is vendored into a repo
+SELF_PATH = os.path.realpath(__file__)
 
 
 def is_test(path):
@@ -363,7 +365,7 @@ def run_audit(repo, base):
     nums, strs = test_literals(repo, base, files, status)
     out = Findings()
     for path in sorted(files):
-        if IGNORE_PATH_RE.search(path):
+        if IGNORE_PATH_RE.search(path) or os.path.realpath(os.path.join(repo, path)) == SELF_PATH:
             continue
         change, code = files[path], status.get(path, "M")
         if is_test(path):

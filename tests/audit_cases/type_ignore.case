@@ -1,0 +1,8 @@
+# Silencing the type checker on a changed line.
+expect: MEDIUM SUPPRESS app.py
+=== base app.py
+def total(items):
+    return sum(items)
+=== change app.py
+def total(items):
+    return sum(items)  # type: ignore

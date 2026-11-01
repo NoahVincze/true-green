@@ -1,0 +1,13 @@
+# Sample data on the production path, flagged with a TODO.
+expect: MEDIUM PLACEHOLDER revenue.py
+expect: MEDIUM TODO revenue.py
+=== base revenue.py
+def total(rows):
+    return sum(r["amount"] for r in rows)
+=== change revenue.py
+def total(rows):
+    return sum(r["amount"] for r in rows)
+
+
+# TODO: swap in the real export
+SAMPLE_DATA = [{"amount": 3}, {"amount": 4}]

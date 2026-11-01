@@ -1,0 +1,16 @@
+# Production code branching on a value the tests use.
+expect: MEDIUM SPECIAL-CASE leap.py
+=== base leap.py
+def is_leap(year):
+    return year % 4 == 0 and (year % 100 != 0 or year % 400 == 0)
+=== base tests/test_leap.py
+from leap import is_leap
+
+
+def test_1900():
+    assert is_leap(1900) is True
+=== change leap.py
+def is_leap(year):
+    if year == 1900:
+        return True
+    return year % 4 == 0 and (year % 100 != 0 or year % 400 == 0)

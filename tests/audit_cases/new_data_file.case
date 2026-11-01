@@ -1,0 +1,8 @@
+# A data file appearing next to the code: where did it come from?
+expect: MEDIUM NEW-DATA data/export.csv
+=== base revenue.py
+def total(rows):
+    return sum(r["amount"] for r in rows)
+=== change data/export.csv
+month,amount
+2026-01,1200

@@ -1,0 +1,19 @@
+# Deleting an assertion that fails weakens the test.
+expect: HIGH TEST-EDIT tests/test_calc.py
+expect: HIGH TEST-ASSERT-REMOVED tests/test_calc.py
+=== base calc.py
+def add(a, b):
+    return a + b if a >= 0 else a - b
+=== base tests/test_calc.py
+from calc import add
+
+
+def test_add():
+    assert add(2, 3) == 5
+    assert add(-2, 3) == 1
+=== change tests/test_calc.py
+from calc import add
+
+
+def test_add():
+    assert add(2, 3) == 5

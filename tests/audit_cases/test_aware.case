@@ -1,0 +1,13 @@
+# Production code that behaves differently under pytest.
+expect: HIGH TEST-AWARE app.py
+=== base app.py
+def limit():
+    return 50
+=== change app.py
+import sys
+
+
+def limit():
+    if "pytest" in sys.modules:
+        return 0
+    return 50

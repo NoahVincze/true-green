@@ -1,0 +1,19 @@
+# Logging the error and continuing is still worth a look, at MEDIUM.
+expect: MEDIUM SWALLOW loader.py
+=== base loader.py
+def load(path):
+    with open(path) as fh:
+        return fh.read()
+=== change loader.py
+import logging
+
+logger = logging.getLogger(__name__)
+
+
+def load(path):
+    try:
+        with open(path) as fh:
+            return fh.read()
+    except OSError:
+        logger.warning("could not read %s", path)
+        return None

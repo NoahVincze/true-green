@@ -1,0 +1,12 @@
+# Handler that uses the caught exception: MEDIUM "does it reach the caller".
+expect: MEDIUM SWALLOW parse.py
+=== base parse.py
+def parse_amount(text, errors):
+    return float(text)
+=== change parse.py
+def parse_amount(text, errors):
+    try:
+        return float(text)
+    except ValueError as exc:
+        errors.append(str(exc))
+        return None

@@ -1,0 +1,21 @@
+# Skipping a failing test is a HIGH finding on top of the test edit.
+expect: HIGH TEST-EDIT tests/test_calc.py
+expect: HIGH TEST-SKIP tests/test_calc.py
+=== base calc.py
+def add(a, b):
+    return a - b
+=== base tests/test_calc.py
+from calc import add
+
+
+def test_add():
+    assert add(2, 3) == 5
+=== change tests/test_calc.py
+import pytest
+
+from calc import add
+
+
+@pytest.mark.skip(reason="flaky")
+def test_add():
+    assert add(2, 3) == 5

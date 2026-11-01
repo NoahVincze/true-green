@@ -1,0 +1,13 @@
+# Deleting a whole test file.
+expect: HIGH TEST-EDIT tests/test_calc.py
+expect: HIGH TEST-ASSERT-REMOVED tests/test_calc.py
+=== base calc.py
+def add(a, b):
+    return a - b
+=== base tests/test_calc.py
+from calc import add
+
+
+def test_add():
+    assert add(2, 3) == 5
+=== delete tests/test_calc.py

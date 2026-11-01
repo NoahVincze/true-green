@@ -1,0 +1,10 @@
+# Same, in a gitignored folder that git diff does not show.
+expect: MEDIUM NEW-DATA data/export.csv
+=== base .gitignore
+data/
+=== base revenue.py
+def total(rows):
+    return sum(r["amount"] for r in rows)
+=== change data/export.csv
+month,amount
+2026-01,1200
