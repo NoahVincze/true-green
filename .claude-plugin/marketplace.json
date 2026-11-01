@@ -7,7 +7,7 @@
   "plugins": [
     {
       "name": "truegreen",
-      "description": "Keeps green checks honest: stops agents from faking passes by editing tests, inventing data, adding silent fallbacks or swallowing errors, and audits the diff before work is reported done.",
+      "description": "Keeps green checks honest: when a check fails, the agent fixes the code or reports the problem, instead of quietly editing tests, inventing data or swallowing errors.",
       "version": "0.1.0",
       "source": "./",
       "author": {
