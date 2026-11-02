@@ -1,4 +1,4 @@
-<h1 align="center">truegreen</h1>
+<h1 align="left">/truegreen</h1>
 
 <p align="center">
   <em>Green means it works. Not that someone edited the test.</em>
