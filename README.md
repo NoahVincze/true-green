@@ -17,22 +17,27 @@
 
 ---
 
-You hand your coding agent a task. It comes back with "all tests pass", and CI
-is green. Usually that means the work is done.
+Your tests are where you wrote down what the code is supposed to do. Every
+expected value in them is a decision someone made.
 
-But a green check only tells you the tests passed, not that they are still the
-tests you wrote. When an agent gets stuck on a failing check, the quickest way
-out is often to change the check: update an expected value, skip a test, add a
-fallback, fill in sample data. Sometimes that is even the right fix. The
-problem is that it happens quietly. The change is a sentence somewhere in the
-summary or a few lines in the diff, and the green check is what you see first.
+Agents now write more code than anyone can read. Teams with high AI adoption
+merge 98% more pull requests while review time per PR rises 91%
+([Faros AI](https://www.faros.ai/blog/ai-software-engineering)). So the green
+check becomes the review, and the green check is exactly what an agent works
+toward. When it is stuck on a failing test, the quickest way to green is to
+change the test: update an expected value, skip it, add a fallback.
 
-Your tests are your record of what the code is supposed to do. Each time they
-change without you noticing, you lose a bit of that.
+Often the agent's guess is even right. In our evals, agents asked to "just get
+CI green" edited a test that contradicted the spec in 11 of 12 runs, and every
+edit was correct. Every report also opened with "CI is green", with the test
+change further down. A decision about what your code should do was made on a
+guess and reported as a footnote. Next time the spec is less clear, and the
+report reads the same.
 
-truegreen is a small skill for your agent that keeps those changes in view.
-When a check fails, the agent fixes the code or tells you up front, instead of
-quietly changing the check.
+truegreen hands that decision back to you. When a check fails, the agent fixes
+the code if the code is wrong. If the test looks wrong, it leaves it red,
+reports `BLOCKED`, and proposes the exact change for you to approve. Tests
+change only when you say so, and every change is listed first.
 
 - **Fixes that fix the code.** If the code is wrong, the agent fixes it. If the
   test is wrong, or something it needs is missing (a service, a credential, a
@@ -133,17 +138,21 @@ it. Current models already do the right thing there, and in our tests the
 skill changed nothing.
 
 It matters in the messier moments: a test that is wrong, and a request to get
-CI green. In our tests, agents without the skill usually changed the test
-themselves and led with "all tests pass". With it, they fixed the code, left
-the test alone and asked.
+CI green. In our tests, agents without the skill changed the test themselves in
+11 of 12 runs and led with "CI is green". With it, 0 of 12 did: they fixed the
+code, left the test alone and asked.
 
 That is not surprising. An agent takes the shortcut when it looks like the only
 way to finish the job. Tell it who gets to decide, and that stopping to ask
-counts as a good result, and it does that instead.
+counts as a good result, and it does that instead. Outside research points the
+same way: in [ImpossibleBench](https://arxiv.org/abs/2510.20270), giving agents
+an explicit way to flag a task for a human cut GPT-5's rate of gaming the tests
+from 54% to 9%.
 
 It is not a guarantee. The tests were small (about a hundred runs, Claude
 models only), and the audit script is a heuristic. Setup and numbers:
-[evals/RESULTS.md](evals/RESULTS.md).
+[evals/RESULTS.md](evals/RESULTS.md). The longer argument, with sources:
+[docs/why.md](docs/why.md).
 
 ## How your agent decides
 
@@ -261,6 +270,7 @@ plugin.json              portable Agent Plugins manifest
 action.yml               GitHub Action that runs the audit script
 .pre-commit-hooks.yaml   pre-commit hook; pyproject.toml packages the script as truegreen-audit
 assets/                  README images
+docs/why.md              the case for the skill, with sources
 tests/                   audit script tests (one scenario per file in audit_cases/) and manifest checks
 evals/                   agent evals with vs. without the skill (see evals/README.md)
 ```
